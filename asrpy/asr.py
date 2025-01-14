@@ -581,7 +581,7 @@ def asr_process(data, sfreq, M, T, windowlen=0.5, lookahead=0.25, stepsize=32,
 
     # loop over smaller segments of the data (for memory purposes)
     last_trivial = False
-    last_R = None
+    last_R = R
     for i in range(splits):
 
         # set the current range
