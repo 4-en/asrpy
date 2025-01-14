@@ -653,7 +653,7 @@ def asr_process(data, sfreq, M, T, windowlen=0.5, lookahead=0.25, stepsize=32,
             last_n, last_R, last_trivial = n, R, trivial
 
     # assign a new lookahead portion
-    carry = np.concatenate([carry, data[:, -P:]])
+    carry = np.concatenate([carry, data[:, -P:]], axis=-1)
     carry = carry[:, -P:]
 
     if return_states:
