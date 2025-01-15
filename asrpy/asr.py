@@ -582,6 +582,7 @@ def asr_process(data, sfreq, M, T, windowlen=0.5, lookahead=0.25, stepsize=32,
     # loop over smaller segments of the data (for memory purposes)
     last_trivial = False
     last_R = R
+
     for i in range(splits):
 
         # set the current range
@@ -604,19 +605,25 @@ def asr_process(data, sfreq, M, T, windowlen=0.5, lookahead=0.25, stepsize=32,
         update_at = np.arange(stepsize,
                               Xcov.shape[-1] + stepsize - 2,
                               stepsize)
+        
+        # set the last update to the end of the data
+        # (for very short data segments that are shorter than stepsize)
+        if len(update_at) == 0:
+            update_at = np.array([Xcov.shape[-1] - 1])
+
         update_at = np.minimum(update_at, Xcov.shape[-1]) - 1
+            
 
         # set the previous reconstruction matrix if none was assigned
         if last_R is None:
-            update_at = np.concatenate([[0], update_at])
             last_R = np.eye(C)
+            update_at = np.concatenate([[0], update_at])
 
         Xcov = np.reshape(Xcov[:, update_at], (C, C, -1))
 
         # loop through the updating intervals
         last_n = 0
-        for j in range(len(update_at) - 1):
-
+        for j in range(len(update_at)):
             # get the eigenvectors/values.For method 'riemann', this should
             # be replaced with PGA/ nonlinear eigenvalues
             D, V = np.linalg.eigh(Xcov[:, :, j])
@@ -645,6 +652,7 @@ def asr_process(data, sfreq, M, T, windowlen=0.5, lookahead=0.25, stepsize=32,
                 blend = (1 - np.cos(blend_x)) / 2
 
                 # use cosine blending to replace data with reconstructed data
+                print(f"Replacing from {subrange[0]} to {subrange[-1]} out of {data.shape[1]} samples")
                 tmp_data = data[:, subrange]
                 data[:, subrange] = np.multiply(blend, R @ tmp_data) + \
                                     np.multiply(1 - blend, last_R @ tmp_data) # noqa

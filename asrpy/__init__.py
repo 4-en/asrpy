@@ -12,3 +12,4 @@ the respective submodules.
 """
 
 from .asr import ASR, asr_calibrate, asr_process, clean_windows
+from .rtasr import RTASR
