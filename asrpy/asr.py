@@ -652,7 +652,6 @@ def asr_process(data, sfreq, M, T, windowlen=0.5, lookahead=0.25, stepsize=32,
                 blend = (1 - np.cos(blend_x)) / 2
 
                 # use cosine blending to replace data with reconstructed data
-                print(f"Replacing from {subrange[0]} to {subrange[-1]} out of {data.shape[1]} samples")
                 tmp_data = data[:, subrange]
                 data[:, subrange] = np.multiply(blend, R @ tmp_data) + \
                                     np.multiply(1 - blend, last_R @ tmp_data) # noqa

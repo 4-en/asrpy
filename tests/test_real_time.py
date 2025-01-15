@@ -119,15 +119,15 @@ stream_simulator = StreamSimulator(filtered_data, 10)
 from asrpy import asr_calibrate, asr_process, RTASR
 
 # test ASR on offline data first
-M, T = asr_calibrate(filtered_data[:, :2000], 100)
-asr_data = asr_process(filtered_data, 100, M, T)
+M, T = asr_calibrate(filtered_data[:, :6000], 100)
+asr_data = asr_process(filtered_data, 100, M, T, stepsize=10)
 
         
 
 rtasr = RTASR(100, 14, 0.25, True, 60)
-rtasr._M = M
-rtasr._T = T
-rtasr._was_calibrated = True
+#rtasr._M = M
+#rtasr._T = T
+#rtasr._was_calibrated = True
 
 rtasr_data = np.zeros((14, 1))
 
@@ -144,7 +144,7 @@ roll = int(lookahead * 100)
 rtasr_data = np.roll(rtasr_data, -roll, axis=1)
 asr_data = np.roll(asr_data, -roll, axis=1)
 
-compare_samples([filtered_data, asr_data, rtasr_data], ["No ASR", "ASR Offline", "ASR Online"], start=100*120, length=1000)
+compare_samples([filtered_data, asr_data, rtasr_data], ["No ASR", "ASR Offline", "ASR Online"], start=100*153, length=1000)
 
 carry = rtasr._carry
 print(f"Carry shape: {carry.shape}")
@@ -169,7 +169,7 @@ def print_signal_info(data: np.ndarray, name=None):
     # print(f"Std: {np.std(data, axis=1)}")
     print(f"Outliers: {measure_outliers(data)}")
 
-print_signal_info(data, "Original")
-print_signal_info(filtered_data, "Filtered")
-print_signal_info(asr_data, "ASR")
-print_signal_info(rtasr_data, "RTASR")
+print_signal_info(data[:,10000:], "Original")
+print_signal_info(filtered_data[:,10000:], "Filtered")
+print_signal_info(asr_data[:,10000:], "ASR")
+print_signal_info(rtasr_data[:,10000:], "RTASR")
